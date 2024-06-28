@@ -3,9 +3,9 @@ import "./App.css";
 import AppLayout from "./layout/app-layout";
 import Landing from "./pages/landing-page";
 import Dashboard from "./pages/dashboard";
-import Auth from "./pages/auth";
 import Link from "./pages/link";
 import RedirectLink from "./pages/redirect-link";
+import Auth from "./pages/auth";
 
 function App() {
   const router = createBrowserRouter([
