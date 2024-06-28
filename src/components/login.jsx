@@ -9,9 +9,12 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import Error from "./error";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import * as Yup from "yup";
+import useFetch from "@/hooks/use-fetch";
+import { login } from "@/db/apiAuth";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
   const [error, setError] = useState([]);
@@ -20,8 +23,6 @@ const Login = () => {
     password: "",
   });
 
-  console.log("formData__email", formData.email);
-  console.log("formData__password", formData.password);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -29,6 +30,24 @@ const Login = () => {
       [name]: value,
     }));
   };
+
+  const {
+    data,
+    error: hookErr,
+    loading,
+    fn: fnLogin,
+  } = useFetch(login, formData);
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const longLink = searchParams.get("createNew");
+
+  useEffect(() => {
+    console.log("Data__is_Coming___", data);
+    if (hookErr === null && data) {
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+  }, [data, hookErr]);
 
   const handleLogin = async () => {
     setError([]);
@@ -44,6 +63,7 @@ const Login = () => {
 
       await schema.validate(formData, { abortEarly: false });
       //! api call
+      await fnLogin();
     } catch (e) {
       const newErrors = [];
       e?.inner.forEach((err) => {
@@ -59,7 +79,7 @@ const Login = () => {
       <CardHeader>
         <CardTitle>Login</CardTitle>
         <CardDescription>to your accoout, if you have one!</CardDescription>
-        <Error message={"Something went wrong"} />
+        {hookErr && <Error message={hookErr.message} />}
       </CardHeader>
       <CardContent classname="space-y-2">
         <div className="space=y-1">
@@ -85,7 +105,7 @@ const Login = () => {
       </CardContent>
       <CardFooter>
         <Button onClick={handleLogin}>
-          {false ? <BeatLoader size={8} color="#36d7b7" /> : "Login"}
+          {loading ? <BeatLoader size={8} color="#36d7b7" /> : "Login"}
         </Button>
       </CardFooter>
     </Card>
