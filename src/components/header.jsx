@@ -11,13 +11,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon, LogOut } from "lucide-react";
 import { UrlState } from "@/context";
+import useFetch from "@/hooks/use-fetch";
+import { logout } from "@/db/apiAuth";
+import { BarLoader } from "react-spinners";
 
 const Header = () => {
   const navigate = useNavigate();
 
   const { user, fetchUser } = UrlState();
 
-  console.log("user", user);
+  const { loading, fn: fnLogout } = useFetch(logout);
 
   function createAbbreviation(fullName = "") {
     // Return early if the input is not a string or is empty
@@ -37,44 +40,56 @@ const Header = () => {
   }
 
   return (
-    <nav className="py-4 flex justify-between items-center">
-      <Link to="/">
-        <img
-          src="/public/shrinker.png"
-          alt="shrinker-pro-logo"
-          className="w-40 "
-        />
-      </Link>
-      {!user ? (
-        <Button onClick={() => navigate("/auth")}>Login</Button>
-      ) : (
-        <DropdownMenu>
-          <DropdownMenuTrigger className="w-10 rounded-full overflow-hidden">
-            <Avatar>
-              <AvatarImage
-                src={`${user?.user_metadata?.profile_pic}`}
-                className="object-contain"
-              />
-              <AvatarFallback>
-                {createAbbreviation(user?.user_metadata?.name)}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>{user?.user_metadata?.name}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LinkIcon className="h-4 w-4 mr-2" />
-              <span>My Links</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-400">
-              <LogOut className="w-4 h-4 mr-2" />
-              <span>Logout</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </nav>
+    <>
+      <nav className="py-4 flex justify-between items-center">
+        <Link to="/">
+          <img
+            src="/public/shrinker.png"
+            alt="shrinker-pro-logo"
+            className="w-40 "
+          />
+        </Link>
+        {!user ? (
+          <Button onClick={() => navigate("/auth")}>Login</Button>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="w-10 rounded-full overflow-hidden">
+              <Avatar>
+                <AvatarImage
+                  src={`${user?.user_metadata?.profile_pic}`}
+                  className="object-contain"
+                />
+                <AvatarFallback>
+                  {createAbbreviation(user?.user_metadata?.name)}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>{user?.user_metadata?.name}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LinkIcon className="h-4 w-4 mr-2" />
+                <span>My Links</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-red-400">
+                <LogOut className="w-4 h-4 mr-2" />
+                <span
+                  onClick={() => {
+                    fnLogout().then(() => {
+                      fetchUser();
+                      navigate("/");
+                    });
+                  }}
+                >
+                  Logout
+                </span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </nav>
+      {loading && <BarLoader className="mb-4" width={"100%"} color="#fff" />}
+    </>
   );
 };
 

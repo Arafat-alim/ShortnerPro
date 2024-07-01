@@ -15,7 +15,7 @@ import * as Yup from "yup";
 import useFetch from "@/hooks/use-fetch";
 import { signup } from "@/db/apiAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { urlState } from "@/context";
+import { UrlState } from "@/context";
 
 const Signup = () => {
   const [error, setError] = useState([]);
@@ -44,7 +44,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const longLink = searchParams.get("createNew");
-  const { fetchUser } = urlState();
+  const { fetchUser } = UrlState();
 
   useEffect(() => {
     if (hookErr === null && data) {
