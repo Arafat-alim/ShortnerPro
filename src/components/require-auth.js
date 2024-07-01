@@ -1,7 +1,6 @@
 import { UrlState } from "@/context";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BarLoader } from "react-spinners";
 
 /**
  *
@@ -14,12 +13,16 @@ import { BarLoader } from "react-spinners";
 const RequireAuth = ({ children }) => {
   const navigate = useNavigate();
   const { isAuthenticated, loading } = UrlState();
+  console.log("isAuthenticated___", isAuthenticated);
 
   useEffect(() => {
     if (!isAuthenticated && loading === false) navigate("/auth");
   }, [isAuthenticated, loading]);
 
-  if (!loading) return <BarLoader width="100%" color="#36d7b7" />;
+  if (loading) {
+    return "Loading...";
+  }
+
   if (isAuthenticated) return children;
 };
 
