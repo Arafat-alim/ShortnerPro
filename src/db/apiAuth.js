@@ -37,7 +37,7 @@ export async function signup({ name, email, password, profile_pic }) {
     options: {
       data: {
         name,
-        profile_pic: `${supabaseUrl}/storage/v1/object/public/profile_pic/${profile_pic}`,
+        profile_pic: `${supabaseUrl}/storage/v1/object/public/profile_pic/${fileName}`,
       },
     },
   });
