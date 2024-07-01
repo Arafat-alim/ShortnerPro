@@ -20,7 +20,7 @@ const UrlProvider = ({ children }) => {
 };
 
 //! to access the data, user required useContext hook from react.
-export const urlState = () => {
+export const UrlState = () => {
   return useContext(UrlContext);
 };
 
