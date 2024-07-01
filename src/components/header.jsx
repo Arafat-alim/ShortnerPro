@@ -10,10 +10,31 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { LinkIcon, LogOut } from "lucide-react";
+import { UrlState } from "@/context";
 
 const Header = () => {
   const navigate = useNavigate();
-  const isLoggedIn = true;
+
+  const { user, fetchUser } = UrlState();
+
+  console.log("user", user);
+
+  function createAbbreviation(fullName = "") {
+    // Return early if the input is not a string or is empty
+    if (typeof fullName !== "string" || fullName.trim() === "") {
+      return "";
+    }
+
+    // Split the full name by spaces and filter out empty strings
+    const nameParts = fullName.split(" ").filter((part) => part.trim() !== "");
+
+    // Map the first character of each part to a new array
+    const abbreviation = nameParts
+      .map((part) => part[0].toUpperCase())
+      .join("");
+
+    return abbreviation;
+  }
 
   return (
     <nav className="py-4 flex justify-between items-center">
@@ -21,21 +42,26 @@ const Header = () => {
         <img
           src="/public/shrinker.png"
           alt="shrinker-pro-logo"
-          className="h-16"
+          className="w-40 "
         />
       </Link>
-      {!isLoggedIn ? (
+      {!user ? (
         <Button onClick={() => navigate("/auth")}>Login</Button>
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger className="w-10 rounded-full overflow-hidden">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>AAA</AvatarFallback>
+              <AvatarImage
+                src={`${user?.user_metadata?.profile_pic}`}
+                className="object-contain"
+              />
+              <AvatarFallback>
+                {createAbbreviation(user?.user_metadata?.name)}
+              </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel>Arafat Aman Alim</DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.user_metadata?.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LinkIcon className="h-4 w-4 mr-2" />
