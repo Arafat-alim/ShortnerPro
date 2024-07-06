@@ -14,13 +14,17 @@ import Error from "./error";
 import { Card } from "./ui/card";
 import { UrlState } from "@/context";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
+import { QRCode } from "react-qrcode-logo";
+import UrlValidator from "@/hooks/use-urlValidator";
 
 const CreateLink = () => {
   const { user } = UrlState();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { isValid, validateUrl } = UrlValidator();
   const longLink = searchParams.get("createNow");
 
   const [formData, setFormData] = useState({
@@ -28,6 +32,12 @@ const CreateLink = () => {
     longUrl: longLink ? longLink : "",
     customUrl: "",
   });
+
+  const ref = useRef();
+
+  useEffect(() => {
+    validateUrl(formData.longUrl);
+  }, [formData.longUrl]);
 
   const schema = yup.object().shape({
     title: yup.string().required("Title is required"),
@@ -59,6 +69,8 @@ const CreateLink = () => {
         <AlertDialogHeader>
           <AlertDialogTitle>Create new</AlertDialogTitle>
         </AlertDialogHeader>
+
+        {isValid && <QRCode values={formData.longUrl} size={250} ref={ref} />}
         <Input
           name="title"
           value={formData.value}
@@ -76,7 +88,12 @@ const CreateLink = () => {
           placeholder="Enter a long url"
           disabled={longLink ? true : false}
         />
-        <Error message={"Some error"} />
+
+        {formData.longUrl ? (
+          !isValid ? (
+            <Error message={"Please paste the valid URL"} />
+          ) : null
+        ) : null}
         <div className="flex items-center gap-2">
           <Card className="p-2">localhost</Card>
           <Input
